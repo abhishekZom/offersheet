@@ -17,20 +17,12 @@ offersheet.config(['$routeProvider', function($routeProvider){
 
 
 offersheet.run(['$rootScope', function($rootScope) {
-    $rootScope.showSpinner = function() {
-        $('#mainLoader').show();
-        $('#myTable05').hide();
-    }
     $rootScope.hideSpinner = function() {
         $('#mainLoader').hide();
-        $('#myTable05').show();
     }
     
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-            $rootScope.showSpinner();
-    });
-    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-            $rootScope.hideSpinner();
+    $rootScope.$on('$routeChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+        $rootScope.hideSpinner();
     });
 }]);
 

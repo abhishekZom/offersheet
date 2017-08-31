@@ -10,10 +10,9 @@
 }
 
 #mainLoader{
-	display : none
-}
-#myTable05{
-	display : none
+	position: fixed;
+	margin-top : 20%;
+	margin-left : 48%;
 }
 .container { width: 100%}
 
