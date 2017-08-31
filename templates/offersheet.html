@@ -1,0 +1,142 @@
+<script>
+    $('#myTable05').fixedHeaderTable({
+        altClass: 'odd',
+        footer: true,
+    });
+</script>
+<!-- this is the main container view for the offersheet -->
+<div class="container" >
+    <div class="alertContainer">
+        <div class="alert alert-success" role="alert">
+            This is a success alert—check it out!
+        </div>
+        <div class="alert alert-danger" role="alert">
+            This is a danger alert—check it out!
+        </div>
+    </div>
+    <div class="row" id="offersheetContent">
+        <div class="col-sm-12 text-center">
+            <img src="http://115.113.189.18/vglorder/vpop_dev/sites/default/files/shop_lc_logo.png">
+        </div>
+        <br>
+        <div class="col-sm-12">
+            <h4>Event Planning Data (UK)</h4>
+        </div>
+        <div class="col-sm-12" style="height: 500px; overflow: auto">
+            <div id="mainLoader"><img src="./images/big_loader.gif" alt="loading data"></div>
+            <table class="table table-bordered" id="myTable05" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>S. No.</th>                <th>image</th>                <th>Event Name</th>           <th>EventDt</th>
+                        <th>Cal.Confirm</th>           <th>ActionDt</th>             <th>OfferCutOffDt</th>
+                        <th>ActionDt</th>              <th>ShipmentDt</th>           <th>ActionDt</th>            <th>StoneInHand?</th>
+                        <th>Budget($)</th>             <th class="casting-th">Casting-SKU</th>          <th class="casting-th">Casting-Qty</th>
+                        <th class="casting-th">Casting-Val($)</th>          <th class="steel-th">Steel-SKU</th>             <th class="steel-th">Steel-Qty</th>
+                        <th class="steel-th">Steel-Val($)</th>              <th class="beads-th">Beads-SKU</th>             <th class="beads-th">Beads-Qty</th>
+                        <th class="beads-th">Beads-Val($)</th>              <th class="base-th">Base-SKU</th>               <th class="base-th">Base-Qty</th>
+                        <th class="base-th">Base-Val($)</th>                <th class="watch-th">Watch-SKU</th>             <th class="watch-th">Watch-Qty</th>
+                        <th class="watch-th">Watch-Val($)</th>              <th>BudgetCoverd($)</th>                        <th>BudgetDiff.($)</th>
+                        <th>FacEvntMerch.</th>         <th>Event Buyer</th>          <th>FacOffSKUOff.</th>
+                        <th>FacOffSKUOrd.</th>
+                    </tr>
+                </thead>
+
+
+            <tbody>
+              <tr ng-repeat="(key, value) in products">
+                <!-- <td>heloo</td>   -->
+                <td scope="row">{{$index +1}}</td>
+                <td scope="row"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt=""></span></td>
+                <td>{{value.title}} ({{value.field_event_hour}})</td>
+                <td>{{value.event_date}}</td>
+                <td>-------</td>
+                <td><input class="form-control" type="text"></td>
+                <td>-------</td>
+                <td><input class="form-control" type="text"></td>
+                <td>-------</td>
+                <td><input class="form-control" type="text"></td>
+                <td>{{value.field_stone_detail_in_hand}}</td>
+                <td>{{value.field_event_bali_budget}}</td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-show="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_casting_sku'" ng-hide="loaderFlag" ng-model="value.field_casting_sku"  ng-change="updateData(key, {'field_casting_sku': value['field_casting_sku']}, propName, loaderFlag)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_casting_quantity'" ng-model="value.field_casting_quantity" ng-change="updateData(key, {'field_casting_quantity': value['field_casting_quantity']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_casting_value'" ng-model="value.field_casting_value" ng-change="updateData(key, {'field_casting_value': value['field_casting_value']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_steel_sku'" ng-model="value.field_steel_sku" ng-change="updateData(key, {'field_steel_sku': value['field_steel_sku']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_steel_quantity'" ng-model="value.field_steel_quantity" ng-change="updateData(key, {'field_steel_quantity': value['field_steel_quantity']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_steel_value'" ng-model="value.field_steel_value" ng-change="updateData(key, {'field_steel_value': value['field_steel_value']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_beads_sku'" ng-model="value.field_beads_sku" ng-change="updateData(key, {'field_beads_sku': value['field_beads_sku']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_beads_quantity'" ng-model="value.field_beads_quantity" ng-change="updateData(key, {'field_beads_quantity': value['field_beads_quantity']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_beads_value'" ng-model="value.field_beads_value" ng-change="updateData(key, {'field_beads_value': value['field_beads_value']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_base_metal_sku'" ng-model="value.field_base_metal_sku" ng-change="updateData(key, {'field_base_metal_sku': value['field_base_metal_sku']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_base_metal_quantity'" ng-model="value.field_base_metal_quantity" ng-change="updateData(key, {'field_base_metal_quantity': value['field_base_metal_quantity']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_base_metal_value'" ng-model="value.field_base_metal_value" ng-change="updateData(key, {'field_base_metal_value': value['field_base_metal_value']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_watch_sku'" ng-model="value.field_watch_sku" ng-change="updateData(key, {'field_watch_sku': value['field_watch_sku']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_watch_quantity'" ng-model="value.field_watch_quantity" ng-change="updateData(key, {'field_casfield_watch_quantityting_sku': value['field_watch_quantity']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_watch_value'" ng-model="value.field_watch_value" ng-change="updateData(key, {'field_watch_value': value['field_watch_value']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_budget_covered'" ng-model="value.field_budget_covered" ng-change="updateData(key, {'field_budget_covered': value['field_budget_covered']}, propName)">
+                </td>
+                <td>{{value.field_event_bali_budget-value.field_budget_covered}}</td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_factory_event_merch'" ng-model="value.field_factory_event_merch" ng-change="updateData(key, {'field_factory_event_merch': value['field_factory_event_merch']}, propName)">
+                </td>
+                <td>-----</td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_factory_sku_offered'" ng-model="value.field_factory_sku_offered" ng-change="updateData(key, {'field_factory_sku_offered': value['field_factory_sku_offered']}, propName)">
+                </td>
+                <td ng-init="loaderFlag=false">
+                    <span><img src="./images/small_loader.gif" alt="loading" ng-if="loaderFlag"></span>
+                    <input class="form-control" type="text" ng-init="propName = 'field_factory_sku_ordered'" ng-model="value.field_factory_sku_ordered" ng-change="updateData(key, {'field_factory_sku_ordered': value['field_factory_sku_ordered']}, propName)">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+</div>
