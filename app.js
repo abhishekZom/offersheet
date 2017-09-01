@@ -1,6 +1,8 @@
 // app bootstraps here
 var offersheet = angular.module('offersheet',['ngRoute']);
 //ui-router not required as their is only one screen in the app
+
+// global config for the app
 offersheet.config(['$routeProvider', function($routeProvider){
     $routeProvider
     .when('/',{
@@ -16,6 +18,8 @@ offersheet.config(['$routeProvider', function($routeProvider){
 }]);
 
 
+
+// initial runtime code
 offersheet.run(['$rootScope', function($rootScope) {
     $rootScope.hideSpinner = function() {
         $('#mainLoader').hide();
@@ -27,11 +31,8 @@ offersheet.run(['$rootScope', function($rootScope) {
 }]);
 
 
-// offersheet.run(function() {
-//     $('#mainLoader').s();
-// });
 
-// controller for base path
+// main app controller
 offersheet.controller('appController', ['$scope', 'products', 'appService', 'alertService', '$timeout', 'utils',function($scope, products, appService, alertService, $timeout, utils) {
     // scope bindings
     $scope.products = products;
@@ -39,12 +40,15 @@ offersheet.controller('appController', ['$scope', 'products', 'appService', 'ale
     $scope.productHeaders = $scope.products['header'];
     $scope.shadowProducts = $scope.products;
     $scope.updateData = updateData;
+    $scope.isUpdating = false;
+    $scope.recordCount = products.total;
 
     init();
 
     function init() {
         if($scope.products) {
             delete $scope.products['header'];
+            delete $scope.products['total'];
             alertService.alertSuccess('data loaded successfully!');
         } else {
             alertService.alertFailure('failed to load data!');
@@ -52,37 +56,57 @@ offersheet.controller('appController', ['$scope', 'products', 'appService', 'ale
     }
 
     var timeout;
-    function updateData(key,value, prop, loaderFlag) {
+    function updateData(key,value, prop, index) {
         //clear timeout as soon as user types again within a second
         clearTimeout(timeout);
         timeout = setTimeout(function() {
             //code in this block will execute once user has not typed anything for one second
-            $scope.$apply(function() {
-                loaderFlag = true;
-            });
+
+            // check if the value entered is numeric
+            var str = value[prop];
+            for(var i= 0; i< (str.length); i++) {
+                if(str.charCodeAt(i) <48 || str.charCodeAt(i) >57) {
+                    // show alert and return input is invalid
+                    alertService.alertFailure('failed to update data! Only numbers Allowed!');
+                    return;
+                }
+            }
+
+            // update ui to show loader and disable all inputs
+            $('#loader_'+ prop + index).show();
+            $('#input_'+ prop + index).hide();
+            $scope.isUpdating = true;
+
+            // hit the api for updation
             appService.updateData(key,value)
             .then(function(res) {
                 if(res.data && res.message == "success") {
+                    // on success bind data and update ui to hide loader and enable all inputs
+                    $scope.$apply(function() {
+                        $scope.isUpdating = false;
+                    });
                     alertService.alertSuccess('data updated successfully!');
-                    // refresh single field
-                    $scope.products[key][prop] = res.data.prop;
-                    loaderFlag = false;
+                    $scope.products[key][prop] = res.data[prop];
+                    $('#loader_'+ prop + index).hide();
+                    $('#input_'+ prop + index).show();
                 }
             })
             .catch(function(err) {
                 alertService.alertFailure('failed to update data!');
                 console.log(err);
             });
-        }, 1000);
+        }, 500);
     }
 }]);
+
+
 
 // services for the app
 offersheet.service('appService', ['$http', function($http) {
     //get all data from api
     this.getAllData = function() {
         return new Promise(function(resolve, reject) {
-            $.get( "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/1/2018", function( data ) {
+            $.get( "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/1/2019", function( data ) {
                 if(data) {
                     resolve(data);
                 } else {
@@ -112,6 +136,7 @@ offersheet.service('appService', ['$http', function($http) {
 }]);
 
 
+
 // alert service
 offersheet.service('alertService', ['$timeout', function($timeout) {
     this.alertSuccess = function successHandler(msg) {
@@ -125,12 +150,13 @@ offersheet.service('alertService', ['$timeout', function($timeout) {
         $('.alert-danger').html(msg).fadeIn();
         $timeout(function() {
             $('.alert-danger').fadeOut();
-        }, 2000)
+        }, 2000);
     };
 }]);
 
 
-// to be used later for the purposes of event debouncing
+
+// service for utilites
 offersheet.service('utils', function() {
     this.debounce = function debounce(func, wait, immediate) {
         // 'private' variable for instance

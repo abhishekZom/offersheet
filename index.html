@@ -4,6 +4,7 @@
     <head>
         <link rel="stylesheet" href="./lib/bootstrap.min.css">
         <link rel="stylesheet" href="./style/style.css"/>
+        <link rel="stylesheet" href="./style/font-awesome.min.css"/>
         <script src="./lib/jquery-3.2.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
         <script src="./lib/bootstrap.min.js"></script>
@@ -15,7 +16,9 @@
         <script src="./lib/jquery.fixedheadertable.js"></script>
     </head>
     <body>
-        <div id="mainLoader" class="initialLoader"><img src="./images/big_loader.gif" alt="loading data"></div>
+        <div id="mainLoader" class="initialLoader"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
+            <div class="text-center">Please wait....</div>
+            <!--<img src="./images/big_loader.gif" alt="loading data">--></div>
         <div id="container" class="appContainer" ng-app="offersheet">
             <div ng-view></div>
         </div>
