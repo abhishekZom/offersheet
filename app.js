@@ -33,7 +33,7 @@ offersheet.run(['$rootScope', function($rootScope) {
 
 
 // main app controller
-offersheet.controller('appController', ['$scope', 'products', 'appService', 'alertService', '$timeout', 'utils',function($scope, products, appService, alertService, $timeout, utils) {
+offersheet.controller('appController', ['$scope', 'products', 'appService', 'alertService', '$timeout', 'utils', '$log',function($scope, products, appService, alertService, $timeout, utils, $log) {
     // scope bindings
     $scope.products = products;
     $scope.isLoading = false;
@@ -51,6 +51,7 @@ offersheet.controller('appController', ['$scope', 'products', 'appService', 'ale
             delete $scope.products['total'];
             alertService.alertSuccess('data loaded successfully!');
         } else {
+            $log().error('request to load data failed');
             alertService.alertFailure('failed to load data!');
         }
     }
