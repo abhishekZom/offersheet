@@ -24,6 +24,7 @@
             <img src="http://115.113.189.18/vglorder/vpop_dev/sites/default/files/shop_lc_logo.png">
         </div>
         <br>
+        <div><input type="text" ng-model="searchQuery"></div>
         <div class="col-sm-12">
             <h4>Event Planning Data (UK)</h4>
             <span class="pull-right"><b>Total Records:{{recordCount}}</b></span>
@@ -48,7 +49,7 @@
 
 
             <tbody>
-              <tr ng-repeat="(key, value) in products">
+              <tr ng-repeat="(key, value) in products | filter:searchQuery">
                 <!-- <td>heloo</td>   -->
                 <td scope="row">{{$index +1}}</td>
                 <td scope="row"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt="" ng-click="openImageModal(value.image)"></span></td>

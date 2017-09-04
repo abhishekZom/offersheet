@@ -78,14 +78,7 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'app
     function openImageModal(imageUrl) {
         $uibModal.open({
             templateUrl: './templates/imageModal.html',
-            controller: 'imageModalController',
-            appendTo: $('body'),
-            backdrop: true,
-            resolve : {
-                imageName: function() {
-                    return imageUrl;
-                }
-            }
+            controller: 'imageModalController'
         });
     }
 
