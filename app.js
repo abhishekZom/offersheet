@@ -1,8 +1,8 @@
 // app bootstraps here
-var offersheet = angular.module('offersheet',['ngRoute']);
+var offersheet = angular.module('offersheet',['ngRoute', 'ui.bootstrap']);
 //ui-router not required as their is only one screen in the app
 
-// global config for the app
+// global config for bootstraping the app
 offersheet.config(['$routeProvider', function($routeProvider){
     $routeProvider
     .when('/',{
@@ -10,7 +10,7 @@ offersheet.config(['$routeProvider', function($routeProvider){
         controller: 'appController as app',
         resolve: {
             products: function(appService) {
-                return appService.getAllData();
+                return appService.getAllData(0, 100);
             }
         }
     })
@@ -19,7 +19,7 @@ offersheet.config(['$routeProvider', function($routeProvider){
 
 
 
-// initial runtime code
+// initial code for app bootstrapings
 offersheet.run(['$rootScope', function($rootScope) {
     $rootScope.hideSpinner = function() {
         $('#mainLoader').hide();
@@ -30,17 +30,26 @@ offersheet.run(['$rootScope', function($rootScope) {
     });
 
     $rootScope.productsPage = 1;
-    $rootScope.productsCount = 50;
+    $rootScope.productsCount = 100;
 }]);
 
-
+offersheet.controller('imageModalController', ['$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+    $scope.imageUrl = "https://akamaicdn3.shoplc.com/LCProdImage/LCProdImage/";
+}]);
 
 // main app controller
-offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'appService', 'alertService', '$timeout', 'utils', '$log',function($scope, $rootScope, products, appService, alertService, $timeout, utils, $log) {
-    var timeout;
+offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'appService', 'alertService', '$timeout', 'utils', '$uibModal',function($scope, $rootScope, products, appService, alertService, $timeout, utils, $uibModal) {
+    var timeout; // timeout initialization for event debouncing
+    $scope.shadowProducts = {};
+    $scope.shadowProducts = angular.copy(products);
+
+    // initialize controller setup
     init();
 
-    // initialize scope variables and do controller setup
+    /**
+     * 
+     * initializes the controller local setup
+     */
     function init() {
         // scope var bindings
         $scope.products = products;
@@ -48,7 +57,8 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'app
         $scope.productHeaders = $scope.products['header'];
         $scope.recordCount = products.total;
         $scope.isUpdating = false;
-        $scope.loadNextShift = laodNextShift;
+        $scope.loadNextShift = loadNextShift;
+        $scope.openImageModal = openImageModal;
 
         // scope methods binding
         $scope.updateData = updateData;
@@ -58,60 +68,95 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'app
             delete $scope.products['total'];
             alertService.alertSuccess('data loaded successfully!');
 
-            $scope.loadNextShift();
+            // $scope.loadNextShift();
         } else {
             // log error and show alert
-            $log().error('request to load data failed');
             alertService.alertFailure('failed to load data!');
         }
     }
 
-    // loads the table data in shifts using pagination
-    function loadNextShift(page, count) {
+    function openImageModal(imageUrl) {
+        $uibModal.open({
+            templateUrl: './templates/imageModal.html',
+            controller: 'imageModalController',
+            appendTo: $('body'),
+            backdrop: true,
+            resolve : {
+                imageName: function() {
+                    return imageUrl;
+                }
+            }
+        });
+    }
+
+    /**
+     * loads the table data in shifts using pagination
+     * 
+     * @param {Number} page  offset for pagination
+     * @param {Number} count limit for pagination
+     */
+    function loadNextShift() {
         // The delay in next load helps keeping other update activites fast and safe
         $timeout(function() {
-            appService.getAllData(page, count)
+            appService.getAllData($rootScope.productsPage, $rootScope.productsCount)
             .then(function(res) {
+                $scope.recordCount += res.total;
+                delete res['header'];
+                delete res['total'];
                 if(res) {
                     // write check for the length of the returned response
-                    if(!(utils.getObjlength(res) > 0)) {
+                    if((utils.getObjlength(res) > 0)) {
                         angular.extend($scope.products, res);
-                        page++;
-                        $scope.loadNextShift(page, count);
+                        $scope.shadowProducts = angular.copy($scope.products);
+                        $rootScope.productsPage++;
+                        $scope.loadNextShift();
                     }
-                    else if(utils.getObjlength(res) > 0) {
-                        $log().info('all data loaded successfully!');
+                    else if(!(utils.getObjlength(res) > 0)) {
                         alertService.alertSuccess('all data loaded successfully!');
                         return;
                     }
                 }
             })
             .catch(function(err) {
-                $log().error('loading data failed on page' + page);
-                alertService.alertFailure('loading data failed on page' + page);
+                alertService.alertFailure('loading data failed on page' + $rootScope.productsPage+1);
             });
-        }, 2000);
+        }, 0);
     }
 
 
-    // update a single entry in the table cell
+    /**
+     * 
+     * @param {String} key      object key for the current row
+     * @param {Object} value    current row data
+     * @param {String} prop     prop name for the colume to be updated
+     * @param {Number} index    index of current row
+     */
     function updateData(key,value, prop, index) {
         //clear timeout as soon as user types again within a second
         clearTimeout(timeout);
         timeout = setTimeout(function() {
             //code in this block will execute once user has not typed anything for one second
 
+            // check if the value entered has actually changed the initial value
+            if($scope.products[key][prop] == $scope.shadowProducts[key][prop]) {
+                alertService.alertFailure('field value is unchanged!');
+                return;
+            }
+
             // check if the value entered is numeric
             var str = value[prop];
             for(var i= 0; i< (str.length); i++) {
                 if(str.charCodeAt(i) <48 || str.charCodeAt(i) >57) {
                     // show alert and return input is invalid
+                    $scope.$apply(function() {
+                        $scope.products[key][prop] = $scope.shadowProducts[key][prop];
+                    });
                     alertService.alertFailure('failed to update data! Only numbers Allowed!');
                     return;
                 }
             }
 
-            // update ui to show loader and disable all inputs
+            // if all good update ui to show loader in the active input and disable all other inputs
             $('#loader_'+ prop + index).show();
             $('#input_'+ prop + index).hide();
             $scope.isUpdating = true;
@@ -120,14 +165,17 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'app
             appService.updateData(key,value)
             .then(function(res) {
                 if(res.data && res.message == "success") {
-                    // on success bind data and update ui to hide loader and enable all inputs
+                    // on success bind data, update ui to hide loader and enable all inputs
+                    // -------------------------------------
                     $scope.$apply(function() {
                         $scope.isUpdating = false;
                     });
                     alertService.alertSuccess('data updated successfully!');
                     $scope.products[key][prop] = res.data[prop];
+                    $scope.shadowProducts[key][prop] = $scope.products[key][prop];
                     $('#loader_'+ prop + index).hide();
                     $('#input_'+ prop + index).show();
+                    // -------------------------------------
                 }
             })
             .catch(function(err) {
@@ -138,14 +186,12 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'products', 'app
     }
 }]);
 
-
-
-// services for the app
+// services for the service requests
 offersheet.service('appService', ['$http', function($http) {
     //get all data from api
-    this.getAllData = function() {
+    this.getAllData = function(offset, limit) {
         return new Promise(function(resolve, reject) {
-            $.get( "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/1/2019/1/", function( data ) {
+            $.get( "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/1/2019/" + offset + "/" + limit, function( data ) {
                 if(data) {
                     resolve(data);
                 } else {

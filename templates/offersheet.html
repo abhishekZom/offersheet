@@ -9,27 +9,6 @@
 </script>
 
 
-<!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Modal Header</h4>
-      </div>
-      <div class="modal-body">
-        <p><img width="300px" height="300px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/21/3/2130416.jpg" alt=""></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
 <!-- this is the main container view for the offersheet -->
 <div class="container" >
     <div class="alertContainer">
@@ -72,7 +51,7 @@
               <tr ng-repeat="(key, value) in products">
                 <!-- <td>heloo</td>   -->
                 <td scope="row">{{$index +1}}</td>
-                <td scope="row"><span><img width="30px" height="30px"  data-toggle="modal" data-target="#myModal"  src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt=""></span></td>
+                <td scope="row"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt="" ng-click="openImageModal(value.image)"></span></td>
                 <td>{{value.title}} ({{value.field_event_hour}})</td>
                 <td>{{value.event_date}}</td>
                 <td>-------</td>
