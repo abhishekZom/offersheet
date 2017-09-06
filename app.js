@@ -57,12 +57,68 @@ offersheet.controller('imageModalController', ['$scope', '$uibModalInstance', 'v
 
 
 
-
 // main app controller
 offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appService', 'alertService', '$timeout', 'utils', '$uibModal',function($scope, $rootScope, data, appService, alertService, $timeout, utils, $uibModal) {
     var timeout; // timeout initialization for event debouncing
-    $scope.shadowProducts = {};
+    $scope.shadowProducts = [];
+    $scope.visibleProducts = [];
+    $scope.lastKnownScrollHeight = 0;
+    $scope.renderSectionOffset = 0;
+    $scope.visibleProductsCount = $scope.visibleProducts.length;
     $scope.shadowProducts = angular.copy(data.data);// this is for the purpose of flashbacks and model comparisons
+
+
+    var newTimeout;
+    // dynamically updates the number of tabel rows rendered at any time depending on the scroll position and direction
+    document.getElementsByClassName('fht-tbody')[0].onscroll = function() {
+        var that = this; //save current scope for later reference inside closure
+        clearTimeout(newTimeout);
+        newTimeout = setTimeout(function() {
+            var tobeAddedSectionindex = null;
+            var tobeRemovedSectionIndex = null;
+            // console.log(this.scrollTop);
+            // console.log(this.scrollHeight);
+                if((that.scrollTop > (90*(that.scrollHeight-1000)/100)) && (that.scrollTop-$scope.lastKnownScrollHeight) > 0) {
+                    // append next section of rows to list of rendered elements
+                    $timeout(function() {
+                        $scope.renderSectionOffset++;
+                        tobeAddedSectionindex = $scope.renderSectionOffset;
+                        $scope.visibleProducts = $scope.visibleProducts.concat($scope.products.slice(tobeAddedSectionindex * 100, (tobeAddedSectionindex+1)*100));
+                        $scope.visibleProductsCount = $scope.visibleProducts.length;
+                        $scope.lastKnownScrollHeight = that.scrollTop;
+                        
+                        // // remove previous section of rows from the list of rendered elements
+                    if($scope.renderSectionOffset >= 2) {
+                        tobeRemovedSectionIndex = $scope.renderSectionOffset-2;
+                        $scope.visibleProducts = $scope.visibleProducts.filter(function(product) {
+                            if($scope.visibleProducts.indexOf(product) < (tobeRemovedSectionIndex * 100)  || $scope.visibleProducts.indexOf(product) >= (tobeRemovedSectionIndex+1)*100) {
+                                return product;
+                            }
+                        });
+                    }
+                    }, 10);
+    
+                    
+                 // else if(this.scrollTop < 200  && ((this.scrollTop-$scope.lastKnownScrollHeight) > 0))  {
+                //     // append previous section of rows to list of rendered elements
+                //     if($scope.renderSectionOffset >= 2) {
+                //         $scope.renderSectionOffset--;
+                //         tobeAddedSectionindex = $scope.renderSectionOffset - 1;
+                //         $scope.visibleProducts = $scope.products.slice(tobeAddedSectionindex*100, (tobeAddedSectionindex+1)*100).concat($scope.visibleProducts);
+                //         $scope.lastKnownScrollHeight = this.scrollTop;
+    
+                //         // remove the next section of rows to the list of rendered elements
+                //         tobeRemovedSectionIndex = $scope.renderSectionOffset + 2;
+                //         $scope.visibleProducts = $scope.visibleProducts.filter(function(product) {
+                //             if($scope.visibleProducts.indexOf(product) < (tobeRemovedSectionIndex * 100)  || $scope.visibleProducts.indexof(product) > (tobeRemovedSectionIndex+1)*100) {
+                //                 return product;
+                //             }
+                //         });
+                //     }
+                    
+                }
+        }, 10);
+    }
 
     // initialize controller setup
     init();
@@ -74,6 +130,8 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
     function init() {
         // scope var bindings
         $scope.products = data.data;
+        $scope.visibleProducts =$scope.products.slice($scope.renderSectionOffset * 100, ($scope.renderSectionOffset+1)*200); // renders first
+        $scope.visibleProductsCount = $scope.visibleProducts.length;
         $scope.isLoading = false;
         $scope.productHeaders = data.info.headers;
         $scope.recordCount = data.info.total;
@@ -89,14 +147,18 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
         if($scope.products) {
             //clean the products data and show success
             alertService.alertSuccess('data loaded successfully!');
-            $scope.loadAllInSecondShift();
+            $scope.loadNextShift();
         } else {
             // log error and show alert
             alertService.alertFailure('failed to load data!');
         }
     }
 
-    // method to open the image modal popup
+    /**
+     * method to open the image modal popup
+     * 
+     * @param {Object} value the value of current row to be updated 
+     */
     function openImageModal(value) {
         $uibModal.open({
             templateUrl: './templates/imageModal.html',
@@ -113,6 +175,8 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
         }, 100);
     }
 
+
+    // to optimize the loading of all data
     function loadAllInSecondShift() {
         var allPromiseArray = [];
         for(var i=0; i<=10; i++) {
@@ -121,12 +185,14 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
         }
 
         Promise.all(allPromiseArray).then(function(data) {
-            data.forEach(function(ele) {
-                 $scope.shadowProducts = $scope.shadowProducts.concat(ele.data);
-            });
             $timeout(function() {
-                $scope.products = $scope.shadowProducts;
+                data.forEach(function(ele) {
+                    $scope.products = $scope.products.concat(ele.data);
+                });
             }, 0);
+            // $timeout(function() {
+            //     $scope.products = $scope.shadowProducts;
+            // }, 0);
         }).catch(function(err) {
             console.log(err);
             throw err;
@@ -145,19 +211,24 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
             appService.getAllData($rootScope.productsPage, $rootScope.productsCount)
             .then(function(res) {
                 $scope.recordCount += res.info.total;
-                if(res) {
+                if(res && res.data) {
                     // write check for the length of the returned response
                     if(res.data.length > 0) {
                         $scope.products = $scope.products.concat(res.data);
-                        $scope.shadowProducts = angular.copy($scope.products);
+                        
                         $rootScope.productsPage++;
                         $scope.loadNextShift();
                     }
-                    else if(!((res.data.length) > 0)) {
+                    else {
                         alertService.alertSuccess('all data loaded successfully!');
                         return;
                     }
                 }
+                else {
+                    alertService.alertSuccess('all data loaded successfully!');
+                    return;
+                }
+                $scope.shadowProducts = angular.copy($scope.products);
             })
             .catch(function(err) {
                 alertService.alertFailure('loading data failed on page' + $rootScope.productsPage+1);
@@ -167,10 +238,11 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
 
 
     /**
+     * update the a single cell of data one at a time
      * 
-     * @param {String} key      object key for the current row
-     * @param {Object} value    current row data
-     * @param {String} prop     prop name for the colume to be updated
+     * @param {String} nid      object key for the current row
+     * @param {Object} value    current row, current column data
+     * @param {String} prop     prop name for the column to be updated
      * @param {Number} index    index of current row
      */
     function updateData(nid, value, prop, index) {
@@ -178,12 +250,6 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
         clearTimeout(timeout);
         timeout = setTimeout(function() {
             //code in this block will execute once user has not typed anything for one second
-
-            // check if the value entered has actually changed the initial value
-            if($scope.products[index][prop] == $scope.shadowProducts[index][prop]) {
-                alertService.alertFailure('field value is unchanged!');
-                return;
-            }
 
             // check if the value entered is numeric
             var str = value[prop];
@@ -196,6 +262,12 @@ offersheet.controller('appController', ['$scope', '$rootScope', 'data', 'appServ
                     alertService.alertFailure('failed to update data! Only numbers Allowed!');
                     return;
                 }
+            }
+
+            // check if the value entered has actually changed the initial value
+            if($scope.products[index][prop] == $scope.shadowProducts[index][prop]) {
+                alertService.alertFailure('field value is unchanged!');
+                return;
             }
 
             // if all good update ui to show loader in the active input and disable all other inputs
@@ -232,7 +304,7 @@ offersheet.service('appService', ['$http', function($http) {
     //get all data from api
     this.getAllData = function(offset, limit) {
         return new Promise(function(resolve, reject) {
-            $.get( "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/1/2019/" + offset + "/" + limit, function( data ) {
+            $.get( "http://115.113.189.18/vglorder/poc/offersheet/api/1.0/vgl_offer_sheet/1/2019/" + offset + "/" + limit, function( data ) {
                 if(data) {
                     resolve(data);
                 } else {
@@ -247,7 +319,7 @@ offersheet.service('appService', ['$http', function($http) {
         var payload = JSON.stringify(value);
         return new Promise(function(resolve, reject) {
             jQuery.ajax({
-                url: "http://115.113.189.18/vglorder/vpop_dev/offersheet/api/1.0/vgl_offer_sheet/" + nid,
+                url: "http://115.113.189.18/vglorder/poc/offersheet/api/1.0/vgl_offer_sheet/" + nid,
                 type: 'PUT',
                 contentType: "application/json",
                 data: payload,

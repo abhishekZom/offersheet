@@ -26,7 +26,9 @@
         <div class="col-sm-12">
             <h4>Event Planning Data (UK)</h4>
             <span class="pull-right"><b>Total Records:{{recordCount}}</b></span>
-            <div><input type="text" ng-model="searchQuery"></div>
+            <div>Search: &nbsp<input type="text" ng-model="searchQuery"></div>
+            <div>&nbsp&nbsp&nbsp&nbsp page: &nbsp {{renderSectionOffset}}</div>
+            <div>&nbsp&nbsp&nbsp&nbspVisible Records: &nbsp {{visibleProductsCount}}</div>
         </div>
         <div class="col-sm-12" style="height: 500px; overflow: auto">
             <table class="table table-bordered" id="myTable05" cellpadding="0" cellspacing="0">
@@ -47,8 +49,8 @@
                 </thead>
 
 
-            <tbody>
-              <tr ng-repeat="value in products | filter:searchQuery">
+            <tbody id="tableBody">
+              <tr ng-repeat="value in visibleProducts | filter:searchQuery">
                 <!-- <td>heloo</td>   -->
                 <td scope="row">{{$index +1}}</td>
                 <td scope="row" class="thumbImg"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt="" ng-click="openImageModal(value)"></span></td>
