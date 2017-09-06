@@ -2,9 +2,8 @@
     $('#myTable05').fixedHeaderTable({
         altClass: 'odd',
         footer: true,
-        width: 100%,
-         fixedColumn: false,
-        
+        width: '100%',
+        fixedColumn: false
     });
 </script>
 
@@ -24,10 +23,10 @@
             <img src="http://115.113.189.18/vglorder/vpop_dev/sites/default/files/shop_lc_logo.png">
         </div>
         <br>
-        <div><input type="text" ng-model="searchQuery"></div>
         <div class="col-sm-12">
             <h4>Event Planning Data (UK)</h4>
             <span class="pull-right"><b>Total Records:{{recordCount}}</b></span>
+            <div><input type="text" ng-model="searchQuery"></div>
         </div>
         <div class="col-sm-12" style="height: 500px; overflow: auto">
             <table class="table table-bordered" id="myTable05" cellpadding="0" cellspacing="0">
@@ -49,10 +48,10 @@
 
 
             <tbody>
-              <tr ng-repeat="(key, value) in products | filter:searchQuery">
+              <tr ng-repeat="value in products | filter:searchQuery">
                 <!-- <td>heloo</td>   -->
                 <td scope="row">{{$index +1}}</td>
-                <td scope="row"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt="" ng-click="openImageModal(value.image)"></span></td>
+                <td scope="row" class="thumbImg"><span><img width="30px" height="30px" src="https://akamaicdn3.shoplc.com/LCProdThumb/LCProdThumb/{{value.image}}" alt="" ng-click="openImageModal(value)"></span></td>
                 <td>{{value.title}} ({{value.field_event_hour}})</td>
                 <td>{{value.event_date}}</td>
                 <td>-------</td>
@@ -65,81 +64,81 @@
                 <td>{{value.field_event_bali_budget}}</td>
                 <td class="dataCell">
                     <span id="loader_field_casting_sku{{$index}}" style="text-align: center"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input  id="input_field_casting_sku{{$index}}" class="form-control" type="text" ng-model="value.field_casting_sku" ng-disabled="isUpdating"  ng-change="updateData(key, {'field_casting_sku': value['field_casting_sku']}, 'field_casting_sku', $index)">
+                    <input  id="input_field_casting_sku{{$index}}" class="form-control" type="text" ng-model="value.field_casting_sku" ng-disabled="isUpdating"  ng-change="updateData(value.nid, {'field_casting_sku': value['field_casting_sku']}, 'field_casting_sku', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_casting_quantity{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_casting_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_casting_quantity" ng-disabled="isUpdating" ng-change="updateData(key, {'field_casting_quantity': value['field_casting_quantity']}, 'field_casting_quantity', $index)">
+                    <input id="input_field_casting_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_casting_quantity" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_casting_quantity': value['field_casting_quantity']}, 'field_casting_quantity', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_casting_value{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_casting_value{{$index}}" class="form-control" type="text" ng-model="value.field_casting_value" ng-disabled="isUpdating" ng-change="updateData(key, {'field_casting_value': value['field_casting_value']}, 'field_casting_value', $index)">
+                    <input id="input_field_casting_value{{$index}}" class="form-control" type="text" ng-model="value.field_casting_value" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_casting_value': value['field_casting_value']}, 'field_casting_value', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_steel_sku{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_steel_sku{{$index}}" class="form-control" type="text" ng-model="value.field_steel_sku" ng-disabled="isUpdating" ng-change="updateData(key, {'field_steel_sku': value['field_steel_sku']}, 'field_steel_sku', $index)">
+                    <input id="input_field_steel_sku{{$index}}" class="form-control" type="text" ng-model="value.field_steel_sku" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_steel_sku': value['field_steel_sku']}, 'field_steel_sku', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_steel_quantity{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_steel_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_steel_quantity" ng-disabled="isUpdating" ng-change="updateData(key, {'field_steel_quantity': value['field_steel_quantity']}, 'field_steel_quantity', $index)">
+                    <input id="input_field_steel_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_steel_quantity" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_steel_quantity': value['field_steel_quantity']}, 'field_steel_quantity', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_steel_value{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_steel_value{{$index}}" class="form-control" type="text" ng-model="value.field_steel_value" ng-disabled="isUpdating" ng-change="updateData(key, {'field_steel_value': value['field_steel_value']}, 'field_steel_value', $index)">
+                    <input id="input_field_steel_value{{$index}}" class="form-control" type="text" ng-model="value.field_steel_value" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_steel_value': value['field_steel_value']}, 'field_steel_value', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_beads_sku{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_beads_sku{{$index}}" class="form-control" type="text" ng-model="value.field_beads_sku" ng-disabled="isUpdating" ng-change="updateData(key, {'field_beads_sku': value['field_beads_sku']}, 'field_beads_sku', $index)">
+                    <input id="input_field_beads_sku{{$index}}" class="form-control" type="text" ng-model="value.field_beads_sku" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_beads_sku': value['field_beads_sku']}, 'field_beads_sku', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_beads_quantity{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_beads_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_beads_quantity" ng-disabled="isUpdating" ng-change="updateData(key, {'field_beads_quantity': value['field_beads_quantity']}, 'field_beads_quantity', $index)">
+                    <input id="input_field_beads_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_beads_quantity" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_beads_quantity': value['field_beads_quantity']}, 'field_beads_quantity', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_beads_value{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_beads_value{{$index}}" class="form-control" type="text" ng-model="value.field_beads_value" ng-disabled="isUpdating" ng-change="updateData(key, {'field_beads_value': value['field_beads_value']}, 'field_beads_value', $index)">
+                    <input id="input_field_beads_value{{$index}}" class="form-control" type="text" ng-model="value.field_beads_value" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_beads_value': value['field_beads_value']}, 'field_beads_value', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_base_metal_sku{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_base_metal_sku{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_sku" ng-disabled="isUpdating" ng-change="updateData(key, {'field_base_metal_sku': value['field_base_metal_sku']}, 'field_base_metal_sku', $index)">
+                    <input id="input_field_base_metal_sku{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_sku" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_base_metal_sku': value['field_base_metal_sku']}, 'field_base_metal_sku', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_base_metal_quantity{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_base_metal_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_quantity" ng-disabled="isUpdating" ng-change="updateData(key, {'field_base_metal_quantity': value['field_base_metal_quantity']}, 'field_base_metal_quantity', $index)">
+                    <input id="input_field_base_metal_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_quantity" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_base_metal_quantity': value['field_base_metal_quantity']}, 'field_base_metal_quantity', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_base_metal_value{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_base_metal_value{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_value" ng-disabled="isUpdating" ng-change="updateData(key, {'field_base_metal_value': value['field_base_metal_value']}, 'field_base_metal_value', $index)">
+                    <input id="input_field_base_metal_value{{$index}}" class="form-control" type="text" ng-model="value.field_base_metal_value" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_base_metal_value': value['field_base_metal_value']}, 'field_base_metal_value', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_watch_sku{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_watch_sku{{$index}}" class="form-control" type="text" ng-model="value.field_watch_sku" ng-disabled="isUpdating" ng-change="updateData(key, {'field_watch_sku': value['field_watch_sku']}, 'field_watch_sku', $index)">
+                    <input id="input_field_watch_sku{{$index}}" class="form-control" type="text" ng-model="value.field_watch_sku" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_watch_sku': value['field_watch_sku']}, 'field_watch_sku', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_watch_quantity{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_watch_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_watch_quantity" ng-disabled="isUpdating" ng-change="updateData(key, {'field_casfield_watch_quantityting_sku': value['field_watch_quantity']}, 'field_watch_quantity', $index)">
+                    <input id="input_field_watch_quantity{{$index}}" class="form-control" type="text" ng-model="value.field_watch_quantity" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_casfield_watch_quantityting_sku': value['field_watch_quantity']}, 'field_watch_quantity', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_watch_value{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_watch_value{{$index}}" class="form-control" type="text" ng-model="value.field_watch_value" ng-disabled="isUpdating" ng-change="updateData(key, {'field_watch_value': value['field_watch_value']}, 'field_watch_value', $index)">
+                    <input id="input_field_watch_value{{$index}}" class="form-control" type="text" ng-model="value.field_watch_value" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_watch_value': value['field_watch_value']}, 'field_watch_value', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_budget_covered{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_budget_covered{{$index}}" class="form-control" type="text" ng-model="value.field_budget_covered" ng-disabled="isUpdating" ng-change="updateData(key, {'field_budget_covered': value['field_budget_covered']}, 'field_budget_covered', $index)">
+                    <input id="input_field_budget_covered{{$index}}" class="form-control" type="text" ng-model="value.field_budget_covered" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_budget_covered': value['field_budget_covered']}, 'field_budget_covered', $index)">
                 </td>
                 <td>{{value.field_event_bali_budget - value.field_budget_covered}}</td>
                 <td class="dataCell">
                     <span id="loader_field_factory_event_merch{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_factory_event_merch{{$index}}" class="form-control" type="text"  ng-model="value.field_factory_event_merch" ng-disabled="isUpdating" ng-change="updateData(key, {'field_factory_event_merch': value['field_factory_event_merch']}, 'field_factory_event_merch', $index)">
+                    <input id="input_field_factory_event_merch{{$index}}" class="form-control" type="text"  ng-model="value.field_factory_event_merch" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_factory_event_merch': value['field_factory_event_merch']}, 'field_factory_event_merch', $index)">
                 </td>
                 <td>-----</td>
                 <td class="dataCell">
                     <span id="loader_field_factory_sku_offered{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_factory_sku_offered{{$index}}" class="form-control" type="text" ng-model="value.field_factory_sku_offered" ng-disabled="isUpdating" ng-change="updateData(key, {'field_factory_sku_offered': value['field_factory_sku_offered']}, 'field_factory_sku_offered', $index)">
+                    <input id="input_field_factory_sku_offered{{$index}}" class="form-control" type="text" ng-model="value.field_factory_sku_offered" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_factory_sku_offered': value['field_factory_sku_offered']}, 'field_factory_sku_offered', $index)">
                 </td>
                 <td class="dataCell">
                     <span id="loader_field_factory_sku_ordered{{$index}}"><img src="./images/small_loader.gif" alt="loading"></span>
-                    <input id="input_field_factory_sku_ordered{{$index}}" class="form-control" type="text" ng-model="value.field_factory_sku_ordered" ng-disabled="isUpdating" ng-change="updateData(key, {'field_factory_sku_ordered': value['field_factory_sku_ordered']}, 'field_factory_sku_ordered', $index)">
+                    <input id="input_field_factory_sku_ordered{{$index}}" class="form-control" type="text" ng-model="value.field_factory_sku_ordered" ng-disabled="isUpdating" ng-change="updateData(value.nid, {'field_factory_sku_ordered': value['field_factory_sku_ordered']}, 'field_factory_sku_ordered', $index)">
                 </td>
               </tr>
             </tbody>

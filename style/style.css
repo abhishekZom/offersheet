@@ -133,3 +133,15 @@
 }
 
 /* @end */
+
+.lgPopupImage {
+    width: 100%;
+    height: auto;
+   
+}
+.modal {
+    background: rgba(0,0,0,0.5);
+}
+.thumbImg{
+    cursor:pointer;
+}
